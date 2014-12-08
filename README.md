@@ -7,6 +7,8 @@ Dependencies
 ------------
 SchemAnon: https://github.com/TheLanguageArchive/SchemAnon
 
+Translator: https://trac.mpi.nl/browser/latsvn/MetadataTranslator
+
 CMDIValidator: https://trac.clarin.eu/browser/CMDIValidator
 
 IMDI_3.0.xsd (included): https://trac.mpi.nl/browser/latsvn/corpustools/vocabs/IMDI/Schema/IMDI_3.0.xsd
