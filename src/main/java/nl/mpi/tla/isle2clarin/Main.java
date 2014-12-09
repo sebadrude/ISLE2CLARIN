@@ -133,13 +133,13 @@ public class Main {
         public void onValidationReport(final CMDIValidationReport report)
                 throws CMDIValidatorException {
             final File file = report.getFile();
+            int skip = 0;
             switch (report.getHighestSeverity()) {
             case INFO:
                 System.err.println("DBG: file["+file+"] is valid");
                 break;
             case WARNING:
                 System.err.println("WRN: file ["+file+"] is valid (with warnings):");
-                int skip = 0;
                 for (CMDIValidationReport.Message msg : report.getMessages()) {
                     if (msg.getMessage().contains("Failed to read schema document ''")) {
                         skip++;
@@ -152,12 +152,14 @@ public class Main {
                         System.err.println(" ("+msg.getSeverity().getShortcut()+") "+msg.getMessage());
                     }
                 }
-                if (skip>0)
-                    System.err.println("WRN: skipped ["+skip+"] warnings due to lax validation of foreign namespaces");
                 break;
             case ERROR:
                 System.err.println("ERR: file ["+file+"] is invalid:");
                 for (CMDIValidationReport.Message msg : report.getMessages()) {
+                    if (msg.getMessage().contains("Failed to read schema document ''")) {
+                        skip++;
+                        continue;
+                    }
                     if ((msg.getLineNumber() != -1) &&
                             (msg.getColumnNumber() != -1)) {
                         System.err.println(" ("+msg.getSeverity().getShortcut()+") "+msg.getMessage()+" [line="+msg.getLineNumber()+", column="+msg.getColumnNumber()+"]");
@@ -170,6 +172,8 @@ public class Main {
                 throw new CMDIValidatorException("unexpected severity: " +
                         report.getHighestSeverity());
             } // switch
+            if (skip>0)
+                System.err.println("WRN: skipped ["+skip+"] warnings due to lax validation of foreign namespaces");
         }
     } // class Handler    
 }
