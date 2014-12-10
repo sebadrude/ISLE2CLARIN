@@ -16,5 +16,12 @@ IMDI_3.0.xsd (included): https://trac.mpi.nl/browser/latsvn/corpustools/vocabs/I
 Run
 ---
 ```sh
-java -jar isle2clarin.jar <DIR with IMDI files> <file with skip list>?
+java -jar isle2clarin.jar <DIR with IMDI files>
 ```
+
+For more command line options see:
+
+```sh
+java -jar isle2clarin.jar -?
+```
+
