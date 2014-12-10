@@ -28,7 +28,9 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -125,6 +127,9 @@ public class Main {
                     // IMDI 2 CMDI
                     File output = new File(input.getAbsolutePath().replaceAll("\\.imdi", ".cmdi"));
                     PrintWriter out = new PrintWriter(output.getAbsolutePath());
+                    Map<String, Object> params = new HashMap<>();
+                    params.put("formatCMDI", Boolean.FALSE);
+                    imdi2cmdi.setTransformationParameters(params);
                     out.print(imdi2cmdi.getCMDI(input.toURI().toURL(), ""));
                     out.close();
                     System.err.println("DBG: wrote file["+output.getAbsolutePath()+"]");
