@@ -32,21 +32,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import net.sf.saxon.s9api.QName;
-import net.sf.saxon.s9api.XdmAtomicValue;
-import net.sf.saxon.s9api.XdmDestination;
-import net.sf.saxon.s9api.XsltExecutable;
-import net.sf.saxon.s9api.XsltTransformer;
 import nl.mpi.tla.schemanon.Message;
-import nl.mpi.tla.schemanon.SaxonUtils;
 import nl.mpi.tla.schemanon.SchemAnon;
 import nl.mpi.translation.tools.Translator;
 import nl.mpi.translation.tools.TranslatorImpl;
@@ -61,7 +49,7 @@ public class Main {
             // initialize CMDI2IMDI
             boolean validateIMDI = false;
             boolean validateCMDI = false;
-            TreeSet<String> skip = new TreeSet<String>();
+            TreeSet<String> skip = new TreeSet<>();
             Translator imdi2cmdi = new TranslatorImpl();
             SchemAnon tron = new SchemAnon(Main.class.getResource("/IMDI_3.0.xsd"));
             // check command line
@@ -79,7 +67,7 @@ public class Main {
             }
             List arg = options.nonOptionArguments();
             if (arg.size()<1 && arg.size()>2) {
-                System.err.println("FTL: none or too many <DIR> arguments!");
+                System.err.println("FTL: none or too many non-option arguments!");
                 showHelp();
                 System.exit(1);
             }
@@ -91,48 +79,59 @@ public class Main {
                 }
                 skip = loadSkipList((String)arg.get(1));
             }
-            String dir = (String)arg.get(0);
-            File fdir = new File(dir);
-            Collection<File> inputs = FileUtils.listFiles(fdir,new String[] {"imdi"},true);
+            Collection<File> inputs = null;
+            File in = new File((String)arg.get(0));
+            if (in.isDirectory()) {
+                inputs = FileUtils.listFiles(in,new String[] {"imdi"},true);
+            } else if (in.isFile()) {
+                inputs = loadInputList(in);
+            } else {
+                System.err.println("FTL: unknown type of <INPUT>!");
+                showHelp();
+                System.exit(1);
+            }
+            int i = 0;
+            int s = inputs.size();
             for (File input:inputs) {
+                i++;
                 try {
                     String path = input.getAbsolutePath();
-                    System.err.println("DBG: absolute path["+path+"]");
-                    System.err.println("DBG: relative path["+path.replaceAll("^" + fdir.getAbsolutePath() + "/", "")+"]");
+                    //System.err.println("DBG: absolute path["+path+"]");
+                    //System.err.println("DBG: relative path["+path.replaceAll("^" + in.getAbsolutePath() + "/", "")+"]");
                     if (input.isHidden()) {
-                        System.err.println("WRN: file["+path+"] is hidden, skipping it.");
+                        System.err.println("WRN:"+i+"/"+s+": file["+path+"] is hidden, skipping it.");
                         continue;
                     } else if (path.matches(".*/(corpman|sessions)/.*")) {
-                        System.err.println("WRN: file["+path+"] is in a corpman or sessions dir, skipping it.");
+                        System.err.println("WRN:"+i+"/"+s+": file["+path+"] is in a corpman or sessions dir, skipping it.");
                         continue;
-                    } else if (skip.contains(path.replaceAll("^" + fdir.getAbsolutePath() + "/", ""))) {
-                        System.err.println("WRN: file["+path+"] is in the skip list, skipping it.");
+                    } else if (skip.contains(path.replaceAll("^" + in.getAbsolutePath() + "/", ""))) {
+                        System.err.println("WRN:"+i+"/"+s+": file["+path+"] is in the skip list, skipping it.");
                         continue;
                     } else if (skip.contains(path)) {
-                        System.err.println("WRN: file["+path+"] is in the skip list, skipping it.");
+                        System.err.println("WRN:"+i+"/"+s+": file["+path+"] is in the skip list, skipping it.");
                         continue;
                     } else
-                        System.err.println("DBG: convert file["+path.replaceAll("^" + dir + "/", "")+"]");
+                        System.err.println("DBG:"+i+"/"+s+": convert file["+path.replaceAll("^" + (String)arg.get(0) + "/", "")+"]");
                     if (validateIMDI) {
                         // validate IMDI
                         if (!tron.validate(input)) {
-                            System.err.println("ERR: invalid file["+input.getAbsolutePath()+"]");
+                            System.err.println("ERR:"+i+"/"+s+": invalid file["+input.getAbsolutePath()+"]");
                             for (Message msg : tron.getMessages()) {
-                                System.out.println("" + (msg.isError() ? "ERR: " : "WRN: ") + (msg.getLocation() != null ? "at " + msg.getLocation() : ""));
-                                System.out.println("" + (msg.isError() ? "ERR: " : "WRN: ") + msg.getText());
+                                System.out.println("" + (msg.isError() ? "ERR: " : "WRN: ") + i+"/"+s+": " + (msg.getLocation() != null ? "at " + msg.getLocation() : ""));
+                                System.out.println("" + (msg.isError() ? "ERR: " : "WRN: ") + i+"/"+s+": " + msg.getText());
                             }
                         } else
-                            System.err.println("DBG: valid file["+input.getAbsolutePath()+"]");
+                            System.err.println("DBG:"+i+"/"+s+": valid file["+input.getAbsolutePath()+"]");
                     }
                     // IMDI 2 CMDI
-                    File output = new File(input.getAbsolutePath().replaceAll("\\.imdi", ".cmdi"));
+                    File output = new File(input.getAbsolutePath().replaceAll("\\.imdi$", ".cmdi"));
                     PrintWriter out = new PrintWriter(output.getAbsolutePath());
                     Map<String, Object> params = new HashMap<>();
                     params.put("formatCMDI", Boolean.FALSE);
                     imdi2cmdi.setTransformationParameters(params);
                     out.print(imdi2cmdi.getCMDI(input.toURI().toURL(), ""));
                     out.close();
-                    System.err.println("DBG: wrote file["+output.getAbsolutePath()+"]");
+                    System.err.println("DBG:"+i+"/"+s+": wrote   file["+output.getAbsolutePath()+"]");
                     if (validateCMDI) {
                         CMDIValidatorConfig.Builder builder = new CMDIValidatorConfig.Builder(output, new Handler());
                         CMDIValidator validator = new CMDIValidator(builder.build());
@@ -140,7 +139,7 @@ public class Main {
                         processor.process(validator);
                     }
                 } catch(Exception ex) {
-                    System.err.println("ERR:"+input+":"+ex);
+                    System.err.println("ERR:"+i+"/"+s+":"+input+":"+ex);
                     ex.printStackTrace(System.err);
                 }
             }
@@ -151,21 +150,21 @@ public class Main {
     }
     
     private static void showHelp() {
-        System.err.println("INF: isle2clarin <options> -- <DIR> <FILE>?");
-        System.err.println("INF: <DIR>     directory to recurse for IMDI files");
-        System.err.println("INF: <FILE>    skip list (deprecated, better use the -s option)");
+        System.err.println("INF: isle2clarin <options> -- <INPUT> <SKIP>?");
+        System.err.println("INF: <INPUT>   directory to recurse for IMDI files, or file with file paths (one per line) to process");
+        System.err.println("INF: <FILE>    file with file paths (one per line) to skip during processing (deprecated, better use the -s option)");
         System.err.println("INF: isle2clarin options:");
         System.err.println("INF: -i        enable IMDI validation (optional)");
         System.err.println("INF: -c        enable CMDI validation (optional)");
-        System.err.println("INF: -s=<FILE> skip list (optional)");
+        System.err.println("INF: -s=<FILE> file with file paths (one per line) to skip during processing (optional)");
     }
     
     private static TreeSet<String> loadSkipList(String file) throws Exception {
-        TreeSet<String> skip = new TreeSet<String>();
+        TreeSet<String> skip = new TreeSet<>();
         File sfile = new File(file);
         if (sfile.exists()) {
             BufferedReader sin = new BufferedReader(new InputStreamReader(new FileInputStream(sfile)));
-            String line = null;
+            String line;
             while ((line = sin.readLine()) != null) {
                 //if (line.startsWith("/")) {
                     line = line.trim();
@@ -175,6 +174,24 @@ public class Main {
             }
         }
         return skip;
+    }
+    
+    private static Collection<File> loadInputList(File file) throws Exception {
+        TreeSet<File> input = new TreeSet<>();
+        if (file.exists()) {
+            BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            String line;
+            while ((line = in.readLine()) != null) {
+                line = line.trim();
+                //System.err.println("DBG: input["+line+"]");
+                File inf = new File(line);
+                if (inf.exists())
+                    input.add(inf);
+                else
+                    System.err.println("ERR: file["+inf.getAbsolutePath()+"] doesn't exist!");
+            }
+        }
+        return input;
     }
     
     private static class Handler extends CMDIValidationHandlerAdapter {

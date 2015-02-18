@@ -7,6 +7,9 @@
 	Max-Planck Institute for Psycholinguistics
 -->
 <!--
+3.0.19, 2015-02-18, Menzo Windhouwer
+	added Schematron rule to check if a ResourceId is unique, and a ResourceRef can be resolved
+
 3.0.18, 2014-10-14, Menzo Windhouwer
 	added Schematron rule to check if a closedVocabulary file exists
 
@@ -430,6 +433,18 @@
 		Actor
 	-->
 	<xsd:complexType name="Actor_Type">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<!-- Schematron rule to check of a @ResourceRef resolves
+					 NOTE: also applies to the @ResourceRef in Language -->
+				<sch:pattern id="checkResourceRef">
+					<sch:title>Check if a ResourceRef resolves</sch:title>
+					<sch:rule context="*[exists(@ResourceRef)]">
+						<sch:assert test="exists(//*[@ResourceId=current()/@ResourceRef])">The ResourceRef[<sch:value-of select="@ResourceRef"/>] can't be resolved to a ResourceId!</sch:assert>
+					</sch:rule>
+				</sch:pattern>
+			</xsd:appinfo>
+		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="Role" type="imdi:Vocabulary_Type">
 				<xsd:annotation>
@@ -767,6 +782,16 @@
 	<xsd:complexType name="MediaFile_Type">
 		<xsd:annotation>
 			<xsd:documentation>Groups information about the media file</xsd:documentation>
+			<xsd:appinfo>
+				<!-- Schematron rule to check of a @ResourceId is unique
+					 NOTE: also applies to the @ResourceId in Written Resource and the Lexical Resources -->
+				<sch:pattern id="checkResourceId">
+					<sch:title>Check if a ResourceId is unique</sch:title>
+					<sch:rule context="*[exists(@ResourceId)]">
+						<sch:assert test="empty((preceding::*,following::*)[@ResourceId=current()/@ResourceId])">The ResourceId[<sch:value-of select="@ResourceId"/>] isn't unique!</sch:assert>
+					</sch:rule>
+				</sch:pattern>
+			</xsd:appinfo>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="ResourceLink" type="imdi:ResourceLink_Type">
@@ -1154,6 +1179,14 @@
 	<xsd:complexType name="Source_Type">
 		<xsd:annotation>
 			<xsd:documentation>Groups information about the original source; e.g. media-carrier, book, newspaper archive etc.</xsd:documentation>
+			<xsd:appinfo>
+				<sch:pattern id="checkResourceRefs">
+					<sch:title>Check if the ResourceRefs resolve</sch:title>
+					<sch:rule context="*[exists(@ResourceRefs)]">
+						<sch:assert test="empty((for $ref in tokenize(@ResourceRefs,'\s+') return exists(//*[@ResourceId=$ref]))[.=false()])">Not all the references in ResourceRefs[<sch:value-of select="@ResourceRefs"/>] can't be resolved to a ResourceId!</sch:assert>
+					</sch:rule>
+				</sch:pattern>
+			</xsd:appinfo>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="Id">
@@ -1318,7 +1351,7 @@
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<!-- 
-		Language Type
+		N0x8054e70.0x807f718
 		At the moment this type is used both as a sub element of Actor and of Project.
 		Future versions of this schema should ensure that different Language Types are used, so that for example MotherTongue cannot be set when the Language refers to a Project.
 	-->
@@ -1565,15 +1598,15 @@
 		<xsd:annotation>
 			<xsd:documentation>Vocabulary content and attributes</xsd:documentation>
 			<xsd:appinfo>
-			<sch:pattern id="checkClosedVocabularies">
-				<sch:title>Check against closed vocabulary</sch:title>
-				<sch:rule context="*[@Type='ClosedVocabulary'][exists(@Link)]">
-					<sch:assert test="doc-available(@Link)">The closed vocabulary[<sch:value-of select="@Link"/>] isn't available!</sch:assert>
-					<!-- only do the second assertion of the closed vocabulary is available, which is achieved by returning true if the doc is unavailable -->
-					<sch:assert test="if (doc-available(@Link)) then (exists(doc(@Link)//imdi:Entry[@Value=current()])) else (true())">The value[<sch:value-of select="current()"/>] is not allowed by the closed vocabulary[<sch:value-of select="@Link"/>]!</sch:assert>
-				</sch:rule>
-			</sch:pattern>
-	        </xsd:appinfo>
+				<sch:pattern id="checkClosedVocabularies">
+					<sch:title>Check against closed vocabulary</sch:title>
+					<sch:rule context="*[@Type='ClosedVocabulary'][exists(@Link)]">
+						<sch:assert test="doc-available(@Link)">The closed vocabulary[<sch:value-of select="@Link"/>] isn't available!</sch:assert>
+						<!-- only do the second assertion of the closed vocabulary is available, which is achieved by returning true if the doc is unavailable -->
+						<sch:assert test="if (doc-available(@Link)) then (exists(doc(@Link)//imdi:Entry[@Value=current()])) else (true())">The value[<sch:value-of select="current()"/>] is not allowed by the closed vocabulary[<sch:value-of select="@Link"/>]!</sch:assert>
+					</sch:rule>
+				</sch:pattern>
+			</xsd:appinfo>
 		</xsd:annotation>
 		<xsd:simpleContent>
 			<xsd:extension base="imdi:CommaSeparatedString_Value_Type">
