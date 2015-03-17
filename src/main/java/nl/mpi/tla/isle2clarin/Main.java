@@ -38,6 +38,7 @@ import nl.mpi.tla.schemanon.Message;
 import nl.mpi.tla.schemanon.SchemAnon;
 import nl.mpi.translation.tools.Translator;
 import nl.mpi.translation.tools.TranslatorImpl;
+import nl.mpi.translation.tools.UrlStreamResolverImpl;
 import org.apache.commons.io.FileUtils;
 
 /**
@@ -50,7 +51,7 @@ public class Main {
             boolean validateIMDI = false;
             boolean validateCMDI = false;
             TreeSet<String> skip = new TreeSet<>();
-            Translator imdi2cmdi = new TranslatorImpl();
+            Translator imdi2cmdi = new TranslatorImpl(new UrlStreamResolverImpl());
             SchemAnon tron = new SchemAnon(Main.class.getResource("/IMDI_3.0.xsd"));
             // check command line
             OptionParser parser = new OptionParser( "ics:?*" );

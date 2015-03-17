@@ -439,7 +439,7 @@
 					 NOTE: also applies to the @ResourceRef in Language -->
 				<sch:pattern id="checkResourceRef">
 					<sch:title>Check if a ResourceRef resolves</sch:title>
-					<sch:rule context="*[exists(@ResourceRef)]">
+					<sch:rule context="*[normalize-space(@ResourceRef)!='']">
 						<sch:assert test="exists(//*[@ResourceId=current()/@ResourceRef])">The ResourceRef[<sch:value-of select="@ResourceRef"/>] can't be resolved to a ResourceId!</sch:assert>
 					</sch:rule>
 				</sch:pattern>
@@ -787,7 +787,7 @@
 					 NOTE: also applies to the @ResourceId in Written Resource and the Lexical Resources -->
 				<sch:pattern id="checkResourceId">
 					<sch:title>Check if a ResourceId is unique</sch:title>
-					<sch:rule context="*[exists(@ResourceId)]">
+					<sch:rule context="*[normalize-space(@ResourceId)!='']">
 						<sch:assert test="empty((preceding::*,following::*)[@ResourceId=current()/@ResourceId])">The ResourceId[<sch:value-of select="@ResourceId"/>] isn't unique!</sch:assert>
 					</sch:rule>
 				</sch:pattern>
@@ -1182,7 +1182,7 @@
 			<xsd:appinfo>
 				<sch:pattern id="checkResourceRefs">
 					<sch:title>Check if the ResourceRefs resolve</sch:title>
-					<sch:rule context="*[exists(@ResourceRefs)]">
+					<sch:rule context="*[normalize-space(@ResourceRefs)!='']">
 						<sch:assert test="empty((for $ref in tokenize(@ResourceRefs,'\s+') return exists(//*[@ResourceId=$ref]))[.=false()])">Not all the references in ResourceRefs[<sch:value-of select="@ResourceRefs"/>] can't be resolved to a ResourceId!</sch:assert>
 					</sch:rule>
 				</sch:pattern>
