@@ -153,7 +153,7 @@ public class Main {
     private static void showHelp() {
         System.err.println("INF: isle2clarin <options> -- <INPUT> <SKIP>?");
         System.err.println("INF: <INPUT>   directory to recurse for IMDI files, or file with file paths (one per line) to process");
-        System.err.println("INF: <FILE>    file with file paths (one per line) to skip during processing (deprecated, better use the -s option)");
+        System.err.println("INF: <SKIP>    file with file paths (one per line) to skip during processing (deprecated, better use the -s option)");
         System.err.println("INF: isle2clarin options:");
         System.err.println("INF: -i        enable IMDI validation (optional)");
         System.err.println("INF: -c        enable CMDI validation (optional)");
