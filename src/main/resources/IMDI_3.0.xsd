@@ -2,7 +2,7 @@
 <!--
 	XML Schema for IMDI
 	
-	Version 3.0.20
+	Version 3.0.22
 	
 	Max-Planck Institute for Psycholinguistics
 -->
@@ -1407,7 +1407,7 @@
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<!-- 
-		N0x8054e70.0x807f718
+		Language Type
 		At the moment this type is used both as a sub element of Actor and of Project.
 		Future versions of this schema should ensure that different Language Types are used, so that for example MotherTongue cannot be set when the Language refers to a Project.
 	-->
@@ -1635,7 +1635,7 @@
 			<xsd:documentation>The age of a person given as a range</xsd:documentation>
 		</xsd:annotation>
 		<xsd:restriction base="xsd:string">
-			<xsd:pattern value="[0-9]{1,3}(;([0-9]|1[01])(\.([0-9]|[12][0-9]|30))?)?(/[0-9]{1,3}(;([0-9]|1[01])(\.([0-9]|[12][0-9]|30))?)?)?|Unknown|Unspecified"/>
+			<xsd:pattern value="[0-9]{1,3}(;(0?[0-9]|1[01])(\.(0?[0-9]|[12][0-9]|30))?)?(/[0-9]{1,3}(;(0?[0-9]|1[01])(\.(0?[0-9]|[12][0-9]|30))?)?)?|Unknown|Unspecified"/>
 		</xsd:restriction>
 	</xsd:simpleType>
 	<!-- 
