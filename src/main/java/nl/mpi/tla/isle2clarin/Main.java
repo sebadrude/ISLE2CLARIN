@@ -139,6 +139,8 @@ public class Main {
                         SimpleCMDIValidatorProcessor processor = new SimpleCMDIValidatorProcessor();
                         processor.process(validator);
                     }
+                } catch(net.sf.saxon.expr.instruct.TerminationException ex) {
+                    System.err.println("DBG:"+i+"/"+s+":"+input+":"+ex.getMessage());
                 } catch(Exception ex) {
                     System.err.println("ERR:"+i+"/"+s+":"+input+":"+ex);
                     ex.printStackTrace(System.err);
