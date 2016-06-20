@@ -14,11 +14,11 @@
         <dependency>
             <artifactId>metadata-translator</artifactId>
             <groupId>nl.mpi.translation</groupId>
-            <version>1.6-SNAPSHOT</version>
+            <version>1.6.1</version>
         </dependency>
         <dependency>
             <groupId>eu.clarin.cmdi</groupId>
-            <version>0.0.6-SNAPSHOT</version>
+            <version>0.0.7-SNAPSHOT</version>
 	    <artifactId>cmdi-validator-core</artifactId>
         </dependency>
         <dependency>
@@ -73,8 +73,24 @@
     </build>
     <repositories>
         <repository>
-            <id>CLARIN-Snapshot</id>
-            <url>https://nexus.clarin.eu/content/repositories/clarin-snapshot</url>
+            <id>MPI</id>
+            <name>MPI LAT Repository/</name>
+            <url>http://lux15.mpi.nl/nexus/content/groups/public</url>
         </repository>
-    </repositories>
-</project>
+        <repository>
+            <id>MPI-Snapshot</id>
+            <name>MPI LAT Repository/</name>
+            <url>http://lux15.mpi.nl/nexus/content/repositories/MPI-Snapshots</url>
+        </repository>
+        
+        <repository>
+           <id>CLARIN</id>
+           <name>CLARIN Repository</name>
+           <url>https://nexus.clarin.eu/content/repositories/Clarin</url>
+        </repository>
+        <repository>
+           <id>CLARIN-Snapshot</id>
+           <name>CLARIN Snapshot Repository</name>
+           <url>https://nexus.clarin.eu/content/repositories/clarin-snapshot</url>
+        </repository>
+</repositories></project>
