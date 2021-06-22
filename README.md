@@ -23,6 +23,10 @@ java -jar target/isle2clarin.jar -?
 docker build -t isle2clarin https://raw.githubusercontent.com/TheLanguageArchive/ISLE2CLARIN/master/Dockerfile
 docker run isle2clarin -?
 ```
+### example IMDI conversion
+```sh
+docker run -v $HOME/imdis:/tmp/imdis isle2clarin -- /tmp/imdis
+```
 
 ## Dependencies
 - SchemAnon: https://github.com/TheLanguageArchive/SchemAnon
