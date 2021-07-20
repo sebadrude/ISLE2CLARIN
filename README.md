@@ -2,7 +2,12 @@
 
 Convert ISLE Metadata (IMDI) records into CLARIN Component Metadata (CMDI) records.
 
-## Compile
+## Clone and compile
+```sh
+git clone https://github.com/TheLanguageArchive/ISLE2CLARIN && cd ISLE2CLARIN && MAVEN_OPTS=-Xss10M mvn install
+```
+
+## or else if already cloned, go to the directory ISLE2CLARIN and Compile
 ```sh
 MAVEN_OPTS=-Xss10M mvn install
 ```
